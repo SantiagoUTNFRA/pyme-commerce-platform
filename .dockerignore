@@ -1,0 +1,14 @@
+# Solo entra a la imagen lo que hace falta para compilar la API.
+**/bin/
+**/obj/
+.git/
+.github/
+.vs/
+.vscode/
+.idea/
+docs/
+tests/
+**/*.md
+**/.DS_Store
+.env
+docker-compose*.yml

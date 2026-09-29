@@ -1,3 +1,8 @@
+# Entorno local: `docker compose up --build` levanta Postgres, aplica las migraciones y arranca la API.
+
+x-postgres-connection: &postgres-connection
+  ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=pymecommerce;Username=postgres;Password=postgres"
+
 services:
   postgres:
     image: postgres:18-alpine
@@ -16,6 +21,28 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  # Misma imagen que la API, pero con --migrate: aplica las migraciones de todos los módulos y termina.
+  migrator:
+    build: .
+    image: pyme-commerce-api:local
+    command: ["--migrate"]
+    environment:
+      <<: *postgres-connection
+    depends_on:
+      postgres:
+        condition: service_healthy # `depends_on` solo no espera a que Postgres acepte conexiones
+
+  api:
+    build: .
+    image: pyme-commerce-api:local
+    environment:
+      <<: *postgres-connection
+    ports:
+      - "8080:8080"
+    depends_on:
+      migrator:
+        condition: service_completed_successfully # arranca solo si las migraciones terminaron bien
 
 volumes:
   postgres-data:

@@ -12,6 +12,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Referenciar el host trae todos los módulos que registra, así que los tests
+         descubren módulos nuevos sin tener que agregarlos acá. -->
+    <ProjectReference Include="..\..\src\Api\PymeCommerce.Api\PymeCommerce.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 

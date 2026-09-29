@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Interior del módulo Catalogo: todo es internal salvo el registro del módulo (CatalogoModule).
+       Otros módulos solo pueden referenciar PymeCommerce.Catalogo.Contracts. -->
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="EFCore.NamingConventions" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PymeCommerce.Catalogo.Contracts\PymeCommerce.Catalogo.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

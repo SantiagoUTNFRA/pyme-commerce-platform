@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Api/">
+    <Project Path="src/Api/PymeCommerce.Api/PymeCommerce.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Catalogo/">
+    <Project Path="src/Modules/Catalogo/PymeCommerce.Catalogo.Contracts/PymeCommerce.Catalogo.Contracts.csproj" />
+    <Project Path="src/Modules/Catalogo/PymeCommerce.Catalogo/PymeCommerce.Catalogo.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Stock/">
+    <Project Path="src/Modules/Stock/PymeCommerce.Stock.Contracts/PymeCommerce.Stock.Contracts.csproj" />
+    <Project Path="src/Modules/Stock/PymeCommerce.Stock/PymeCommerce.Stock.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PymeCommerce.ArchitectureTests/PymeCommerce.ArchitectureTests.csproj" />
+  </Folder>
+</Solution>

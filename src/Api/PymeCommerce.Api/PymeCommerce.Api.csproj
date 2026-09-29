@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- Host del monolito modular: arma la aplicación y registra cada módulo.
+       Es el único proyecto que referencia el interior de los módulos. -->
+
+  <ItemGroup>
+    <!-- Necesario en el proyecto de arranque para que `dotnet ef` genere migraciones. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Modules\Catalogo\PymeCommerce.Catalogo\PymeCommerce.Catalogo.csproj" />
+    <ProjectReference Include="..\..\Modules\Stock\PymeCommerce.Stock\PymeCommerce.Stock.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Interior del módulo Stock: todo es internal salvo el registro del módulo (StockModule).
+       Otros módulos solo pueden referenciar PymeCommerce.Stock.Contracts. -->
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="EFCore.NamingConventions" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PymeCommerce.Stock.Contracts\PymeCommerce.Stock.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

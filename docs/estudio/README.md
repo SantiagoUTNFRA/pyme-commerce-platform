@@ -22,8 +22,8 @@ Esta carpeta existe para que el repo no sea "solo código que no sé por qué es
 | Tema | Estado | Fase |
 |---|---|---|
 | [Estilos de arquitectura: monolito, modular, microservicios, hexagonal, eventos](arquitectura/estilos-de-arquitectura.md) | 📝 | 0 |
-| ADRs: cómo y por qué registrar decisiones | ⏳ | 0 |
-| Módulos, límites y tests de arquitectura (NetArchTest) | ⏳ | 0 |
+| [ADRs: cómo y por qué registrar decisiones](arquitectura/adrs.md) | 📝 | 0 |
+| [Módulos, límites y tests de arquitectura (ArchUnitNET)](arquitectura/modulos-y-tests-de-arquitectura.md) | 📝 | 0 |
 | Multi-tenancy: estrategias de aislamiento de datos | ⏳ | 1 |
 | Máquinas de estado (ciclo de vida de la orden) | ⏳ | 2 |
 | Sagas / process managers | ⏳ | 4 |
@@ -42,7 +42,7 @@ Esta carpeta existe para que el repo no sea "solo código que no sé por qué es
 | Tema | Estado | Fase |
 |---|---|---|
 | [Docker y Docker Compose](infraestructura/docker-y-compose.md) | 📝 | 0 |
-| GitHub Actions (CI) y GHCR | ⏳ | 0 |
+| [GitHub Actions (CI) y GHCR](infraestructura/github-actions-y-ghcr.md) | 📝 | 0 |
 | [Cloud Run, Neon y Vercel](infraestructura/cloud-run-neon-vercel.md) | 📝 | 1 |
 | CloudAMQP y Secret Manager | ⏳ | 3 |
 | Deploy continuo (CD) | ⏳ | 3 |
@@ -54,8 +54,9 @@ Esta carpeta existe para que el repo no sea "solo código que no sé por qué es
 ### Backend .NET
 | Tema | Estado | Fase |
 |---|---|---|
-| .NET 10: qué trae y por qué no .NET 8 | ⏳ | 0 |
-| EF Core y migraciones | ⏳ | 0 |
+| [.NET 10 y la estructura de la solución (global.json, CPM, props)](backend/dotnet-10-y-estructura-de-la-solucion.md) | 📝 | 0 |
+| [EF Core y migraciones](backend/ef-core-y-migraciones.md) | 📝 | 0 |
+| [Minimal APIs y health checks](backend/minimal-apis-y-health-checks.md) | 📝 | 0 |
 | ASP.NET Core Identity + JWT | ⏳ | 1 |
 | Query filters de EF Core | ⏳ | 1 |
 | Testcontainers | ⏳ | 1 |
@@ -84,6 +85,6 @@ Esta carpeta existe para que el repo no sea "solo código que no sé por qué es
 ### Testing y calidad
 | Tema | Estado | Fase |
 |---|---|---|
-| Pirámide de tests: unitarios, de integración y de arquitectura | ⏳ | 0 |
+| [Pirámide de tests: unitarios, de integración y de arquitectura (xUnit v3)](testing/piramide-de-tests.md) | 📝 | 0 |
 | Tests de contrato para adaptadores externos | ⏳ | 4 |
 | k6: pruebas de carga | 🧩 | 🧩 |

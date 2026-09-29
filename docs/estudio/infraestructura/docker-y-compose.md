@@ -1,7 +1,7 @@
 # Docker y Docker Compose
 
 > **Categoría:** Infraestructura
-> **Fase del roadmap:** 0 · **Estado:** 📝 escrito (intro; se amplía al implementarlo)
+> **Fase del roadmap:** 0 · **Estado:** 📝 escrito (implementado en la Fase 0)
 > **Última actualización:** 2026-09-29
 
 ## Qué es (en criollo)
@@ -32,7 +32,24 @@ En Mac, Docker Desktop corre una VM Linux liviana por debajo, porque los contene
   - la CI construye la imagen y la publica en **GHCR** (GitHub Container Registry, gratis).
 - **Fase 1:** esa misma imagen se despliega en **Cloud Run**.
 - **Fase 2:** se suman RabbitMQ y el worker al compose.
-- Links al código: _(completar al implementar)_.
+- Links al código: [`Dockerfile`](../../../Dockerfile) · [`.dockerignore`](../../../.dockerignore) · [`docker-compose.yml`](../../../docker-compose.yml).
+
+### Cómo quedó el compose
+
+```
+postgres (healthy) ──▶ migrator (--migrate, termina con 0) ──▶ api (:8080)
+```
+
+- **`postgres`:** `postgres:18-alpine`, con volumen y healthcheck (`pg_isready`).
+- **`migrator`:** la **misma imagen** que la API, con el comando `--migrate`. Espera a `service_healthy` de Postgres.
+- **`api`:** espera a `service_completed_successfully` del migrador. Si una migración falla, la API no arranca.
+- La connection string se pasa como variable de entorno: `ConnectionStrings__Postgres` (el `__` equivale a `:` en la configuración de .NET). Apunta a `Host=postgres`, no a `localhost`.
+
+```bash
+docker compose up --build        # levanta todo
+docker compose down              # baja los contenedores (los datos quedan en el volumen)
+docker compose down -v           # baja todo y borra los datos
+```
 
 ### Dockerfile multi-stage (idea)
 Se usan **dos etapas**:
@@ -73,7 +90,14 @@ El resultado es una imagen final mucho más liviana y sin compiladores, así que
 - **Suponer que `depends_on` espera a que Postgres esté listo.** Solo espera a que arranque el contenedor. Hace falta un healthcheck + `condition: service_healthy`.
 
 ## Qué aprendí / dudas abiertas
-_(Completar al implementar la Fase 0.)_
+Cosas que aparecieron al implementarlo:
+- **`COPY --parents src/**/*.csproj ./`** copia todos los `.csproj` respetando sus carpetas. Así se cachea el `restore` sin listar cada proyecto a mano, y un módulo nuevo no obliga a tocar el Dockerfile.
+- **Postgres 18 cambió dónde guarda los datos:** el volumen va en `/var/lib/postgresql`, no en `/var/lib/postgresql/data` como en versiones anteriores.
+- **`service_completed_successfully`** permite modelar "correr una vez y terminar" (el migrador) como un paso previo a la API.
+- **Las imágenes de .NET traen un usuario `app`:** con `USER $APP_UID` la API no corre como root (verificado con `whoami`).
+- La imagen `aspnet` no trae `curl`, así que la API no tiene healthcheck en el compose. Nadie depende de que esté *healthy*, y en la CI se verifica `/health` desde afuera.
+
+_(Espacio personal.)_
 
 ## Para profundizar
 - [Docker: Get started](https://docs.docker.com/get-started/)

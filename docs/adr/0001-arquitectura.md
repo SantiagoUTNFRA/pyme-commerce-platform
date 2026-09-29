@@ -1,7 +1,8 @@
 # ADR-0001: Monolito modular, hexagonal selectivo y mensajería con RabbitMQ
 
 - **Estado:** Aceptado
-- **Fecha:** 2026-09-29
+- **Fecha:** 2026-09-29 · **Revisado:** 2026-09-29 (cierre de la Fase 0)
+- **Detalle de implementación:** [ADR-0002: Estructura de módulos y persistencia](0002-estructura-de-modulos-y-persistencia.md)
 - **Material de estudio:** [Estilos de arquitectura](../estudio/arquitectura/estilos-de-arquitectura.md) · [Colas y RabbitMQ](../estudio/mensajeria/colas-y-rabbitmq.md)
 
 ## Contexto
@@ -102,3 +103,12 @@ Como los módulos ya se comunican por contratos y eventos, la extracción consis
 - **Complejidad del outbox/inbox:** tablas, publicador, limpieza y monitoreo.
 - **Un bug en un módulo puede tirar el proceso entero**, porque no hay aislamiento de fallas entre módulos.
 - **Consistencia eventual:** entre confirmar una orden y ver el stock descontado pasan milisegundos o segundos, y la UI lo tiene que contemplar.
+
+## Revisión: cierre de la Fase 0 (2026-09-29)
+
+Con el esqueleto implementado, la decisión **se mantiene sin cambios**. Lo que se aprendió al implementarla:
+
+- **"API pública" se concretó** como un proyecto `Contracts` por módulo, con el interior `internal`. Detalle en el [ADR-0002](0002-estructura-de-modulos-y-persistencia.md).
+- **Los tests de arquitectura funcionan como red de seguridad.** Una violación a propósito (Stock usando `CatalogoModule`) hizo fallar el test con un mensaje que dice qué tipo depende de cuál.
+- **El compilador cubre la mayor parte del límite, pero no todo.** El interior de un módulo necesita al menos una clase pública para que el host lo registre, y esa clase se podría usar desde otro módulo. Esa es exactamente la brecha que cubre el test.
+- **Sigue abierto:** el worker, el outbox y RabbitMQ entran en la Fase 2, como estaba previsto.

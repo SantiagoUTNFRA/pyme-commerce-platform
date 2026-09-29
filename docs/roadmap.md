@@ -25,12 +25,14 @@ El núcleo es lo que tiene que existir para que el proyecto esté "terminado". C
 - CI con GitHub Actions: build, tests y publicación de la imagen en GitHub Container Registry (GHCR).
 - ADR-0001 revisado.
 
-**Tecnologías nuevas:** Docker, Docker Compose, migraciones de EF Core, NetArchTest (o ArchUnitNET), GitHub Actions, GHCR.
+**Tecnologías nuevas:** Docker, Docker Compose, migraciones de EF Core, ArchUnitNET, GitHub Actions, GHCR.
+
+**Estado:** ✅ terminada el 2026-09-29. Ver la [bitácora](estudio/bitacora.md) y el [ADR-0002](adr/0002-estructura-de-modulos-y-persistencia.md).
 
 **Criterio de terminado**
-- [ ] `docker compose up` levanta la API + Postgres con las migraciones aplicadas.
-- [ ] La CI está en verde en `main`.
-- [ ] Un test de arquitectura **falla** si un módulo referencia el interior de otro.
+- [x] `docker compose up` levanta la API + Postgres con las migraciones aplicadas.
+- [x] La CI está en verde en `main`.
+- [x] Un test de arquitectura **falla** si un módulo referencia el interior de otro.
 
 ---
 

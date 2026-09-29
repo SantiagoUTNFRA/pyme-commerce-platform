@@ -13,6 +13,65 @@ Formato de cada entrada:
 
 ---
 
+## 2026-09-29: Fase 0 terminada ✅
+
+Los tres criterios de terminado se cumplen: `docker compose up` migra y levanta la API, la CI está en verde en `main` y el test de arquitectura falla con una violación a propósito. Estructura documentada en el [ADR-0002](../adr/0002-estructura-de-modulos-y-persistencia.md), y el [ADR-0001](../adr/0001-arquitectura.md) quedó revisado.
+
+#### Agregamos la solución .NET 10 con configuración centralizada
+- **Qué:**
+  - `global.json`, que fija el SDK 10.0.300;
+  - `Directory.Build.props`, con nullable, warnings como errores y analizadores recomendados;
+  - `Directory.Packages.props`, con CPM y transitive pinning;
+  - `.slnx`;
+  - `dotnet-tools.json`, con `dotnet-ef`.
+- **Por qué:** mismo SDK en todos lados, una sola versión de cada paquete y calidad desde el primer commit. Con el transitive pinning, EF Core queda en 10.0.12 en toda la solución, aunque Npgsql pida ≥ 10.0.4.
+- **Impacto:** [.NET 10 y estructura de la solución](backend/dotnet-10-y-estructura-de-la-solucion.md).
+
+#### Agregamos los módulos Catálogo y Stock, con Minimal APIs y `/health`
+- **Qué:** cada módulo tiene un `Contracts` (`I<Modulo>Api` + DTO), un interior `internal`, una entidad semilla (`Producto`, `Deposito`), un endpoint de listado y un health check de base.
+- **Por qué:** hacen falta al menos dos módulos para que el test de límites tenga sentido. Son los módulos de la Fase 1. Los demás se crean cuando llegue su fase.
+- **Impacto:** [Minimal APIs y health checks](backend/minimal-apis-y-health-checks.md).
+
+#### Agregamos EF Core + Npgsql, un esquema por módulo y `snake_case`
+- **Qué:** un `DbContext` por módulo, con su esquema y su propio `__EFMigrationsHistory`. Se usa `EFCore.NamingConventions` y los IDs son UUID v7.
+- **Por qué:** es el aislamiento de datos que pide el ADR-0001. `snake_case` es la convención de Postgres y cambiarla después obliga a renombrar todo el esquema. UUID v7 fragmenta menos los índices que v4.
+- **Impacto:** [EF Core y migraciones](backend/ef-core-y-migraciones.md).
+
+#### Elegimos Postgres 18
+- **Qué:** `postgres:18-alpine` en local. Cuando se cree la base en Neon (Fase 1), hay que elegir también la 18.
+- **Por qué:** es la versión más nueva que soporta Neon (14 a 18, verificado) y genera UUID v7 nativo.
+
+#### Cambiamos NetArchTest por ArchUnitNET
+- **Qué:** los tests de arquitectura usan ArchUnitNET con xUnit v3.
+- **Por qué:** la última versión de NetArchTest.Rules es de mayo de 2021 (verificado en NuGet). ArchUnitNET sigue mantenido.
+- **Impacto:** [Módulos y tests de arquitectura](arquitectura/modulos-y-tests-de-arquitectura.md), [roadmap](../roadmap.md).
+
+#### Agregamos xUnit v3 con Microsoft.Testing.Platform
+- **Qué:** reemplazamos la plantilla (xUnit v2 + VSTest) por xUnit v3 4.x + MTP, declarado en `global.json`.
+- **Por qué:** es la versión mantenida de xUnit, y el SDK 10 soporta MTP de forma nativa en `dotnet test`.
+- **Impacto:** [Pirámide de tests](testing/piramide-de-tests.md).
+
+#### Agregamos Dockerfile multi-stage, `.dockerignore` y compose (Postgres + migrador + API)
+- **Qué:**
+  - build con `sdk:10.0` y runtime con `aspnet:10.0`, usuario no-root;
+  - restore cacheado con `COPY --parents`;
+  - migrador con la misma imagen y `--migrate`.
+- **Por qué:** es el criterio 1 de la fase y la imagen que va a correr en Cloud Run.
+- **Impacto:** [Docker y Docker Compose](infraestructura/docker-y-compose.md).
+
+#### Agregamos la CI con GitHub Actions y la publicación en GHCR
+- **Qué:** tres jobs:
+  - build + tests;
+  - smoke con `docker compose up` + `/health`;
+  - en `main`, publicación en `ghcr.io/santiagoutnfra/pyme-commerce-api`, con tags `sha-…` y `latest`.
+- **Por qué:** es el criterio 2 de la fase. El smoke test además verifica el criterio 1 en cada push, no solo una vez a mano.
+- **Impacto:** [GitHub Actions y GHCR](infraestructura/github-actions-y-ghcr.md).
+
+#### Agregamos notas de estudio y un README
+- **Qué:** notas nuevas: ADRs, módulos y tests de arquitectura, .NET 10, EF Core, Minimal APIs, pirámide de tests y GitHub Actions. Se actualizaron la nota de Docker y el índice, y se agregó un `README.md` en la raíz.
+
+---
+
 ## 2026-09-29: Arranque de la Fase 0
 
 #### Cada módulo son dos proyectos: `Contracts` (público) + interior

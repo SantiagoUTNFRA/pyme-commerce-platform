@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Por defecto, el token del workflow solo puede leer el repo. Cada job pide lo que necesita.
+permissions:
+  contents: read
+
+# Si llega un push nuevo a la misma rama, se cancela la corrida anterior.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-y-tests:
+    name: Build y tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json # misma versión del SDK que en local
+
+      - run: dotnet restore
+      - run: dotnet build --no-restore --configuration Release
+      - run: dotnet test --no-build --configuration Release
+
+  compose:
+    name: docker compose up
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Verifica el criterio de la Fase 0: el compose levanta Postgres, migra y la API responde.
+      - name: Levantar el entorno
+        run: docker compose up --build --detach --wait --wait-timeout 180
+
+      - name: La API responde /health
+        run: curl --fail --silent --show-error --retry 5 --retry-delay 2 --retry-all-errors http://localhost:8080/health
+
+      - name: Logs (si algo falló)
+        if: failure()
+        run: docker compose logs
+
+  imagen:
+    name: Publicar imagen en GHCR
+    needs: [build-y-tests, compose]
+    # Solo en pushes a main: los PRs no publican imágenes.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # para subir la imagen a GHCR con el GITHUB_TOKEN
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Calcula tags y labels. El nombre se pasa a minúsculas (GHCR no acepta mayúsculas).
+      - id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/pyme-commerce-api
+          tags: |
+            type=sha,format=long
+            type=raw,value=latest
+
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Caché de capas entre corridas, guardada en GitHub Actions.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

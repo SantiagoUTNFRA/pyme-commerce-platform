@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: pymecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres # solo para desarrollo local
+    ports:
+      - "5432:5432"
+    volumes:
+      # Desde Postgres 18 los datos viven en /var/lib/postgresql/<versión>/docker,
+      # así que el volumen se monta en /var/lib/postgresql (no en .../data).
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d pymecommerce"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres-data:
